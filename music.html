@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐管理 - 音乐播放器管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- 顶部导航栏 -->
+        <header class="admin-header">
+            <div class="logo">
+                <h1>音乐播放器管理系统</h1>
+            </div>
+            <div class="user-info">
+                <span>管理员</span>
+                <button id="logoutBtn" class="btn btn-sm">退出登录</button>
+            </div>
+        </header>
+
+        <div class="admin-main">
+            <!-- 侧边导航栏 -->
+            <nav class="admin-sidebar">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
+                    <li><a href="users.html"><i class="fas fa-users"></i> 用户管理</a></li>
+                    <li class="active"><a href="music.html"><i class="fas fa-music"></i> 音乐管理</a></li>
+                </ul>
+            </nav>
+
+            <!-- 主内容区 -->
+            <div class="admin-content">
+                <div class="music-management">
+                    <div class="content-header">
+                        <h2>音乐管理</h2>
+                        <div class="search-bar">
+                            <input type="text" id="musicSearchInput" placeholder="搜索歌曲名称...">
+                            <button id="musicSearchBtn"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label for="userFilter">用户筛选:</label>
+                            <select id="userFilter">
+                                <option value="">全部用户</option>
+                                <!-- 动态加载用户列表 -->
+                            </select>
+                        </div>
+                        <!-- <div class="filter-group">
+                            <label for="typeFilter">歌单类型:</label>
+                            <select id="typeFilter">
+                                <option value="">全部类型</option>
+                                <option value="1">云音乐</option>
+                                <option value="2">我的歌单</option>
+                                <option value="3">我喜欢的音乐</option>
+                            </select>
+                        </div> -->
+                    </div>
+
+                    <div class="music-table-container">
+                        <table id="musicTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>歌曲名称</th>
+                                    <th>艺术家</th>
+                                    <th>用户</th>
+                                    <!-- <th>歌单类型</th> -->
+                                    <th>文件大小</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 动态加载音乐列表 -->
+                                <tr>
+                                    <td colspan="7" class="loading-text">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="pagination">
+                        <button id="prevPageBtn" class="pagination-btn" disabled>上一页</button>
+                        <span id="pageInfo">第 1 页</span>
+                        <button id="nextPageBtn" class="pagination-btn" disabled>下一页</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 音乐详情模态框 -->
+    <div id="musicDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>音乐详情</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="music-detail-container">
+                    <div class="music-cover">
+                        <img id="musicCover" src="" alt="音乐封面">
+                    </div>
+                    <div class="music-info-details">
+                        <p><strong>ID:</strong> <span id="musicDetailId"></span></p>
+                        <p><strong>歌曲名称:</strong> <span id="musicDetailName"></span></p>
+                        <p><strong>艺术家:</strong> <span id="musicDetailArtist"></span></p>
+                        <p><strong>用户:</strong> <span id="musicDetailUsername"></span></p>
+                        <!-- <p><strong>歌单类型:</strong> <span id="musicDetailType"></span></p> -->
+                        <p><strong>文件大小:</strong> <span id="musicDetailSize"></span></p>
+                        <p><strong>上传时间:</strong> <span id="musicDetailCreatedAt"></span></p>
+                    </div>
+                </div>
+
+                <!-- <div class="music-preview">
+                    <h4>音乐预览</h4>
+                    <audio id="musicPlayer" controls></audio>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除模态框 -->
+    <div id="confirmDeleteModal" class="modal">
+        <div class="modal-content confirm-modal">
+            <div class="modal-header">
+                <h3>确认删除</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除歌曲 "<span id="deleteMusicName"></span>" 吗？</p>
+                <p class="warning-text">此操作不可撤销，音乐文件将被永久删除。</p>
+
+                <div class="modal-actions confirm-actions">
+                    <button id="cancelDeleteBtn" class="btn btn-secondary">取消</button>
+                    <button id="confirmDeleteBtn" class="btn btn-danger">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/music.js"></script>
+</body>
+
+</html>

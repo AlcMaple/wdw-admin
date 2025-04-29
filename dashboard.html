@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理仪表盘 - 音乐播放器管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- 顶部导航栏 -->
+        <header class="admin-header">
+            <div class="logo">
+                <h1>音乐播放器管理系统</h1>
+            </div>
+            <div class="user-info">
+                <span>管理员</span>
+                <button id="logoutBtn" class="btn btn-sm">退出登录</button>
+            </div>
+        </header>
+
+        <div class="admin-main">
+            <!-- 侧边导航栏 -->
+            <nav class="admin-sidebar">
+                <ul>
+                    <li class="active"><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
+                    <li><a href="users.html"><i class="fas fa-users"></i> 用户管理</a></li>
+                    <li><a href="music.html"><i class="fas fa-music"></i> 音乐管理</a></li>
+                </ul>
+            </nav>
+
+            <!-- 主内容 -->
+            <div class="admin-content">
+                <div class="dashboard">
+                    <h2>系统概览</h2>
+
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <h3>用户总数</h3>
+                                <p id="totalUsers">加载中...</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-music"></i></div>
+                            <div class="stat-info">
+                                <h3>音乐总数</h3>
+                                <p id="totalSongs">加载中...</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-hdd"></i></div>
+                            <div class="stat-info">
+                                <h3>存储空间使用</h3>
+                                <p id="storageUsed">加载中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

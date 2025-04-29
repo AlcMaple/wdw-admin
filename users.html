@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 音乐播放器管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- 顶部导航栏 -->
+        <header class="admin-header">
+            <div class="logo">
+                <h1>音乐播放器管理系统</h1>
+            </div>
+            <div class="user-info">
+                <span>管理员</span>
+                <button id="logoutBtn" class="btn btn-sm">退出登录</button>
+            </div>
+        </header>
+
+        <div class="admin-main">
+            <!-- 侧边导航栏 -->
+            <nav class="admin-sidebar">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
+                    <li class="active"><a href="users.html"><i class="fas fa-users"></i> 用户管理</a></li>
+                    <li><a href="music.html"><i class="fas fa-music"></i> 音乐管理</a></li>
+                </ul>
+            </nav>
+
+            <!-- 主内容区 -->
+            <div class="admin-content">
+                <div class="user-management">
+                    <div class="content-header">
+                        <h2>用户管理</h2>
+                        <div class="search-bar">
+                            <input type="text" id="userSearchInput" placeholder="搜索用户名...">
+                            <button id="userSearchBtn"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="user-table-container">
+                        <table id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th>昵称</th>
+                                    <th>注册时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 动态加载用户列表 -->
+                                <tr>
+                                    <td colspan="5" class="loading-text">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="pagination">
+                        <button id="prevPageBtn" class="pagination-btn" disabled>上一页</button>
+                        <span id="pageInfo">第 1 页</span>
+                        <button id="nextPageBtn" class="pagination-btn" disabled>下一页</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户详情模态框 -->
+    <div id="userDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>用户详情</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="user-detail-container">
+                    <div class="user-avatar">
+                        <img id="userAvatar" src="" alt="用户头像">
+                    </div>
+                    <div class="user-info-details">
+                        <p><strong>ID:</strong> <span id="userDetailId"></span></p>
+                        <p><strong>用户名:</strong> <span id="userDetailUsername"></span></p>
+                        <p><strong>昵称:</strong> <span id="userDetailNickname"></span></p>
+                        <p><strong>注册时间:</strong> <span id="userDetailCreatedAt"></span></p>
+                        <p><strong>简介:</strong> <span id="userDetailIntro"></span></p>
+                        <p><strong>密保问题:</strong> <span id="userDetailSecurityQuestion"></span></p>
+                        <p><strong>密保答案:</strong> <span id="userDetailSecurityAnswer"></span></p>
+                    </div>
+                </div>
+
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <h4>音乐数量</h4>
+                        <p id="userDetailSongCount">0</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>存储空间</h4>
+                        <p id="userDetailStorage">0 MB</p>
+                    </div>
+                </div>
+
+                <!-- <div class="modal-actions">
+                    <button id="deleteUserBtn" class="btn btn-danger">删除用户</button>
+                </div> -->
+
+                <!-- <div class="reset-password">
+                    <h4>重置密码</h4>
+                    <div class="form-group">
+                        <input type="password" id="newPassword" placeholder="输入新密码">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="confirmPassword" placeholder="确认新密码">
+                    </div>
+                    <button id="resetPasswordBtn" class="btn btn-primary">重置密码</button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除模态框 -->
+    <div id="confirmDeleteModal" class="modal">
+        <div class="modal-content confirm-modal">
+            <div class="modal-header">
+                <h3>确认删除</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除用户 "<span id="deleteUserName"></span>" 吗？</p>
+                <p class="warning-text">此操作不可撤销，用户的所有数据将被永久删除。</p>
+
+                <div class="modal-actions confirm-actions">
+                    <button id="cancelDeleteBtn" class="btn btn-secondary">取消</button>
+                    <button id="confirmDeleteBtn" class="btn btn-danger">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 重置密码模态框 -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content reset-modal">
+            <div class="modal-header">
+                <h3>重置密码</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>为用户 "<span id="resetUserName"></span>" 设置新密码</p>
+                
+                <div class="form-group">
+                    <label>新密码</label>
+                    <input type="password" id="newPassword" placeholder="输入新密码">
+                </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <input type="password" id="confirmPassword" placeholder="确认新密码">
+                </div>
+                
+                <div class="modal-actions">
+                    <button id="cancelResetBtn" class="btn btn-secondary">取消</button>
+                    <button id="confirmResetBtn" class="btn btn-primary">确认重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/users.js"></script>
+</body>
+
+</html>
