@@ -165,9 +165,9 @@ document.addEventListener('DOMContentLoaded', function () {
             url += `&user_id=${selectedUser}`;
         }
 
-        if (selectedType) {
-            url += `&playlist_type=${selectedType}`;
-        }
+        // if (selectedType) {
+        //     url += `&playlist_type=${selectedType}`;
+        // }
 
         musicTableBody.innerHTML = '<tr><td colspan="7" class="loading-text">加载中...</td></tr>';
 
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.log("is_global_music", is_api_music);
 
                         // 对于API音乐，不显示用户和歌单类型
-                        const username = is_api_music ? '-' : music.username;
+                        const username = is_api_music ? '-' : (music.username || '未知用户');
 
                         // // 根据歌单类型获取文本描述
                         // let typeText = '未知';
@@ -222,41 +222,44 @@ document.addEventListener('DOMContentLoaded', function () {
                         const disableButtonText = music.is_disabled ? '解除禁用' : '禁用';
                         const disableButtonIcon = music.is_disabled ? 'fa-play-circle' : 'fa-ban';
 
+                        // 只对API音乐显示禁用按钮
+                        const toggleButton = is_api_music ?
+                            `<button class="action-btn toggle-btn" data-id="${music.music_id}" data-disabled="${music.is_disabled}">
+                        <i class="fas ${disableButtonIcon}"></i> ${disableButtonText}
+                    </button>` : '';
+
                         tableHTML += `
-                            <tr class="${isDisabled}">
-                                <td>${music.music_id}</td>
-                                <td>${music.name}</td>
-                                <td>${music.artist || '未知'}</td>
-                                <td>${username}</td>
-                                <td>${fileSizeMB} MB</td>
-                                <td>
-                                    <button class="action-btn view-btn" data-id="${music.music_id}" data-global="${is_api_music}">
-                                        <i class="fas fa-eye"></i> 查看
-                                    </button>
-                                    <button class="action-btn toggle-btn" data-id="${music.music_id}" data-disabled="${music.is_disabled}" data-global="${is_api_music}">
-                                        <i class="fas ${disableButtonIcon}"></i> ${disableButtonText}
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
+                    <tr class="${isDisabled}">
+                        <td>${music.music_id}</td>
+                        <td>${music.name}</td>
+                        <td>${music.artist || '未知'}</td>
+                        <td>${username}</td>
+                        <td>${fileSizeMB} MB</td>
+                        <td>
+                            <button class="action-btn view-btn" data-id="${music.music_id}">
+                                <i class="fas fa-eye"></i> 查看
+                            </button>
+                            ${toggleButton}
+                        </td>
+                    </tr>
+                `;
                     });
                     musicTableBody.innerHTML = tableHTML;
 
-                    // 查看和删除按钮
+                    // 查看按钮
                     document.querySelectorAll('.view-btn').forEach(btn => {
                         btn.addEventListener('click', function () {
                             const musicId = this.getAttribute('data-id');
-                            const isGlobal = this.getAttribute('data-global') === 'true';
-                            showMusicDetail(musicId, isGlobal);
+                            showMusicDetail(musicId);
                         });
                     });
 
+                    // 禁用/启用按钮
                     document.querySelectorAll('.toggle-btn').forEach(btn => {
                         btn.addEventListener('click', function () {
                             const musicId = this.getAttribute('data-id');
                             const isDisabled = this.getAttribute('data-disabled') === 'true';
-                            const isGlobal = this.getAttribute('data-global') === 'true';
-                            toggleDisableMusic(musicId, isDisabled, isGlobal);
+                            toggleDisableMusic(musicId, isDisabled);
                         });
                     });
 
@@ -276,53 +279,32 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // 显示音乐详情
-    function showMusicDetail(musicId, isGlobal) {
+    // 音乐详情
+    function showMusicDetail(musicId) {
         const token = localStorage.getItem('adminToken');
 
-        const endpoint = isGlobal ?
-            `http://localhost:5001/admin/global-music/${musicId}` :
-            `http://localhost:5001/admin/music/${musicId}`;
-
-        fetch(endpoint, {
+        fetch(`http://localhost:5001/admin/music/${musicId}`, {
             headers: {
                 'Authorization': token
             }
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data, "music.js => data");
-                console.log(data.music, "music.js => data.music");
-
                 if (data.music) {
                     const music = data.music;
                     currentMusicId = music.music_id;
 
                     // 详情信息
                     musicDetailId.textContent = music.music_id;
-                    musicDetailName.textContent = music.filename;
+                    musicDetailName.textContent = music.name;
                     musicDetailArtist.textContent = music.artist || '未知';
-                    // musicDetailUsername.textContent = music.username;
 
-                    // // 格式化歌单类型
-                    // let typeText = '-';
+                    // 处理用户名显示
+                    musicDetailUsername.textContent = music.is_api_music ? '-' : (music.username || '未知用户');
+
                     // 格式化文件大小
                     const fileSizeMB = ((music.file_size || 0) / (1024 * 1024)).toFixed(2);
                     musicDetailSize.textContent = `${fileSizeMB} MB`;
-
-                    // API 音乐处理
-                    console.log("music.is_api_music", music.is_api_music);
-
-                    if (music.is_api_music) {
-                        musicDetailUsername.textContent = '-';
-                    } else {
-                        // if (music.playlist_type === 1) typeText = '云音乐';
-                        // if (music.playlist_type === 2) typeText = '我的歌单';
-                        // if (music.playlist_type === 3) typeText = '我喜欢的音乐';
-                        musicDetailUsername.textContent = music.username;
-                    }
-
-                    // musicDetailType.textContent = typeText;
 
                     // 格式化创建时间
                     musicDetailCreatedAt.textContent = formatDate(music.created_at);
@@ -332,14 +314,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     musicCover.onerror = function () {
                         this.src = 'https://via.placeholder.com/140'; // 封面加载失败时使用占位图
                     };
-
-                    // // 设置音乐播放器
-                    // if (music.file_path) {
-                    //     musicPlayer.src = music.file_path;
-                    //     musicPlayer.style.display = 'block';
-                    // } else {
-                    //     musicPlayer.style.display = 'none';
-                    // }
 
                     musicDetailModal.style.display = 'block';
                 } else {
@@ -386,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 控制音乐权限
-    function toggleDisableMusic(musicId, currentState, isGlobal) {
+    function toggleDisableMusic(musicId, currentState) {
         const actionText = currentState ? '解除禁用' : '禁用';
         if (!confirm(`确定要${actionText}这首音乐吗？`)) {
             return;
@@ -394,11 +368,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const token = localStorage.getItem('adminToken');
 
-        const endpoint = isGlobal ?
-            `http://localhost:5001/admin/global-music/${musicId}/toggle-disable` :
-            `http://localhost:5001/admin/music/${musicId}/toggle-disable`;
-
-        fetch(endpoint, {
+        fetch(`http://localhost:5001/admin/music/${musicId}/toggle-disable`, {
             method: 'POST',
             headers: {
                 'Authorization': token
